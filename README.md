@@ -1,4 +1,4 @@
-# Lab5 Assignment - React Weather Forecast
+ Lab5 Assignment - React Weather Forecast
 
 ## Grading
 There are 40 data in the 5 day / 3 hour api (index 0 ~ 39) <br/>
@@ -32,6 +32,6 @@ If you are not using OpenWeatherMap API to get weather data, you will get 0 poin
 
 ## Submission
 Open a new merge request to your branch when you finished your homework. <br />
-**DEADLINE**: 2018/04/17 23:59 <br />
+**DEADLINE**: 2018/04/19 23:59 <br />
 
 <b>Note</b>: When you open merge request, `Title` should be : std{your ID} Submission
