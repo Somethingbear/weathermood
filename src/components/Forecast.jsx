@@ -16,14 +16,26 @@ export default class Forecast extends React.Component {
     };
 
     static getInitWeatherState() {
+        let newArr = new Array(5);
+
+        for (var i = 0; i < 5; i++) {
+                newArr[i] = {
+                    dayOfWeek: "N/A",
+                    temp: NaN,
+                    code: -1,
+                    group: 'na',
+                    description: "N/A"
+                };
+            }
+
         return {
-            city: 'na',
-            code: -1,
-            group: 'na',
-            description: 'N/A',
-            temp: NaN
-        };
+            city: "N/A",
+            tomorrowTemp: NaN,
+            forecastList: newArr,
+        }
+
     }
+
     constructor(props) {
         super(props);
 
@@ -35,7 +47,6 @@ export default class Forecast extends React.Component {
 
         this.handleFormQuery = this.handleFormQuery.bind(this);
 
-        // TODO
     }
 
     componentDidMount() {
@@ -50,9 +61,13 @@ export default class Forecast extends React.Component {
 
     render() {
         return (
-            <div className={`forecast weather-bg ${this.state.group}`}>
+            <div className={`forecast weather-bg ${this.state.forecastList[0].group}`}>
                 <div className={`mask ${this.state.masking ? 'masking' : ''}`}>
-                    <WeatherDisplay {...this.state}/>
+                    <WeatherDisplay masking={this.state.masking}
+                                    group={this.state.forecastList[0].group}
+                                    temp={this.state.forecastList[0].temp}
+                                    description={this.state.forecastList[0].description}
+                                    unit={this.props.unit}/>
                     <WeatherForm city={this.state.city} unit={this.props.unit} onQuery={this.handleFormQuery}/>
                 </div>
             </div>
@@ -65,10 +80,11 @@ export default class Forecast extends React.Component {
             masking: true,
             city: city // set city state immediately to prevent input text (in WeatherForm) from blinking;
         }, () => { // called back after setState completes
-            getForecast(city, unit).then(weather => {
+            getForecast(city, unit).then(forecastInfo => {
                 this.setState({
-                    ...weather,
-                    loading: false
+                    ...forecastInfo,
+                    loading: false,
+                    masking: false
                 }, () => this.notifyUnitChange(unit));
             }).catch(err => {
                 console.error('Error getting weather', err);

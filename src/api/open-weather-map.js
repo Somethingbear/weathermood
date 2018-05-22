@@ -71,12 +71,15 @@ export function getForecast(city, unit) {
         if (res.data.list === undefined) {
             throw new Error(res.data.message);
         } else {
-            let rawList = forecastData.list;
+            let rawList = res.data.list;
             let forecastList = new Array(5);
-            console.log(rawList);
+            //console.log(rawList);
             
-            for (var i = 0 ; i < 6 ; i++) {
+            for (var i = 0 ; i < 5 ; i++) {
                 let dayIndex = i * 8 - 1;
+                if(dayIndex < 0){
+                    dayIndex = 0;
+                }
                 let day = new Date(rawList[dayIndex].dt *1000)
                 let dayOfWeek;
 
