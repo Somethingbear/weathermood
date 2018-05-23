@@ -2,6 +2,7 @@ import React from 'react';
 
 import WeatherDisplay from 'components/WeatherDisplay.jsx';
 import WeatherForm from 'components/WeatherForm.jsx';
+import WeatherTable from 'components/WeatherTable.jsx';
 import {getForecast} from 'api/open-weather-map.js';
 
 import './weather.css';
@@ -22,6 +23,7 @@ export default class Forecast extends React.Component {
                 newArr[i] = {
                     dayOfWeek: "N/A",
                     temp: NaN,
+                    date: "N/A",
                     code: -1,
                     group: 'na',
                     description: "N/A"
@@ -30,7 +32,6 @@ export default class Forecast extends React.Component {
 
         return {
             city: "N/A",
-            tomorrowTemp: NaN,
             forecastList: newArr,
         }
 
@@ -68,6 +69,7 @@ export default class Forecast extends React.Component {
                                     temp={this.state.forecastList[0].temp}
                                     description={this.state.forecastList[0].description}
                                     unit={this.props.unit}/>
+                    <WeatherTable forecastInfo={this.state.forecastList} masking={this.state.masking}/>
                     <WeatherForm city={this.state.city} unit={this.props.unit} onQuery={this.handleFormQuery}/>
                 </div>
             </div>

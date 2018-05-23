@@ -34,7 +34,7 @@ let weatherSource = axios.CancelToken.source();
 export function getWeather(city, unit) {
     var url = `${baseUrl}&q=${encodeURIComponent(city)}&units=${unit}`;
 
-    console.log(`Making forecast request to: ${url}`);
+    console.log(`Making request to: ${url}`);
 
     return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
         if (res.data.cod && res.data.message) {
@@ -65,7 +65,7 @@ export function cancelWeather() {
 export function getForecast(city, unit) {
     var url = `${forecastUrl}&q=${encodeURIComponent(city)}&units=${unit}`;
 
-    console.log(`Making request to: ${forecastUrl}`);
+    console.log(`Making forecast request to: ${forecastUrl}`);
 
     return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
         if (res.data.list === undefined) {
@@ -73,13 +73,12 @@ export function getForecast(city, unit) {
         } else {
             let rawList = res.data.list;
             let forecastList = new Array(5);
-            //console.log(rawList);
             
             for (var i = 0 ; i < 5 ; i++) {
-                let dayIndex = i * 8 - 1;
-                if(dayIndex < 0){
-                    dayIndex = 0;
-                }
+                let dayIndex = i * 8 + 1;
+                // if(dayIndex < 0){
+                //     dayIndex = 0;
+                // }
                 let day = new Date(rawList[dayIndex].dt *1000)
                 let dayOfWeek;
 
@@ -114,6 +113,7 @@ export function getForecast(city, unit) {
                     group: getWeatherGroup(rawList[dayIndex].weather[0].id),
                     description: rawList[dayIndex].weather[0].description,
                     temp: rawList[dayIndex].main.temp,
+                    date: new Date(rawList[dayIndex].dt * 1000).toLocaleDateString(),
                     unit: unit
                 }
             }
