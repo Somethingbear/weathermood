@@ -7,31 +7,19 @@ import {
 import './WeatherTable.css';
 import './owfont-regular.css';
 
-export default class WeatherTable extends React.Component {
-    static propTypes = {
-        city: React.PropTypes.string,
-        unit: React.PropTypes.string
-    };
+export default function WeatherTable(props) {
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-        };
-    }
-
-
-    render(){
-        return(
-            <Container className={`weather-table text-center ${this.props.masking ? 'masking' : ''}`}>
-                    <Row className='names'>
-                        <Col>WEEK</Col>
-                        <Col>DATE</Col>
-                        <Col>WEATHER</Col>
-                        <Col>TEMPERATURE</Col>
-                    </Row>
+    
+    return(
+        <Container className={`weather-table text-center ${props.masking ? 'masking' : ''}`}>
+                <Row className='names'>
+                    <Col>WEEK</Col>
+                    <Col>DATE</Col>
+                    <Col>WEATHER</Col>
+                    <Col>TEMPERATURE</Col>
+                </Row>
                 {
-                    this.props.forecastInfo.map(
+                    props.forecastInfo.map(
                         (item,index)=>{
                             return(
                                 <Row key={index}>
@@ -46,9 +34,9 @@ export default class WeatherTable extends React.Component {
                         }
                     )
                 }
-            </Container>
-        );
-    }
+        </Container>
+    );
+    
 
 
 

@@ -4,6 +4,7 @@ import WeatherDisplay from 'components/WeatherDisplay.jsx';
 import WeatherForm from 'components/WeatherForm.jsx';
 import WeatherTable from 'components/WeatherTable.jsx';
 import {getForecast} from 'api/open-weather-map.js';
+import {getLocalForecast} from 'api/open-weather-map.js';
 
 import './weather.css';
 
@@ -21,6 +22,7 @@ export default class Forecast extends React.Component {
 
         for (var i = 0; i < 5; i++) {
                 newArr[i] = {
+                    city: "N/A",
                     dayOfWeek: "N/A",
                     temp: NaN,
                     date: "N/A",
@@ -31,7 +33,6 @@ export default class Forecast extends React.Component {
             }
 
         return {
-            city: "N/A",
             forecastList: newArr,
         }
 
@@ -42,6 +43,10 @@ export default class Forecast extends React.Component {
 
         this.state = {
             ...Forecast.getInitWeatherState(),
+            coords: {
+                lat: 0,
+                lon: 0
+            },
             loading: false,
             masking: false
         };
@@ -51,7 +56,35 @@ export default class Forecast extends React.Component {
     }
 
     componentDidMount() {
-        this.getForecast('Hsinchu', 'metric');
+        //this.getForecast('Hsinchu', 'metric');
+        
+        navigator.geolocation.getCurrentPosition(
+            (position)=>{
+                let lat = position.coords.latitude;
+                let lon = position.coords.longitude;
+
+                this.setState(
+                    {
+                        coords: {
+                            lat: lat,
+                            lon: lon
+                        }
+                    },
+                    ()=>{
+                        this.getLocalForecast(this.state.coords.lat, this.state.coords.lon, 'metric');
+                    }
+                )
+            },
+            (err)=>{
+                console.warn('ERROR(' + err.code + '): ' + err.message);
+                this.getForecast('Hsinchu', 'metric');
+            },
+            {
+                enableHighAccuracy: false,
+                maximumAge: 0
+            }
+        );
+
     }
 
     componentWillUnmount() {
@@ -70,7 +103,7 @@ export default class Forecast extends React.Component {
                                     description={this.state.forecastList[0].description}
                                     unit={this.props.unit}/>
                     <WeatherTable forecastInfo={this.state.forecastList} masking={this.state.masking}/>
-                    <WeatherForm city={this.state.city} unit={this.props.unit} onQuery={this.handleFormQuery}/>
+                    <WeatherForm city={this.state.forecastList[0].city} unit={this.props.unit} onQuery={this.handleFormQuery}/>
                 </div>
             </div>
         );
@@ -90,6 +123,35 @@ export default class Forecast extends React.Component {
                 }, () => this.notifyUnitChange(unit));
             }).catch(err => {
                 console.error('Error getting weather', err);
+
+                this.setState({
+                    ...Forecast.getInitWeatherState(unit),
+                    loading: false
+                }, () => this.notifyUnitChange(unit));
+            });
+        });
+
+        this.maskInterval = setInterval(() => {
+            clearInterval(this.maskInterval);
+            this.setState({
+                masking: false
+            });
+        }, 600);
+    }
+
+    getLocalForecast(lat, lon, unit) {
+        this.setState({
+            loading: true,
+            masking: true,
+        }, () => {
+            getLocalForecast(lat, lon, unit).then(localForecastInfo => {
+                this.setState({
+                    ...localForecastInfo,
+                    loading: false,
+                    masking: false
+                }, () => this.notifyUnitChange(unit));
+            }).catch(err => {
+                console.error('Error getting local forecast', err);
 
                 this.setState({
                     ...Forecast.getInitWeatherState(unit),

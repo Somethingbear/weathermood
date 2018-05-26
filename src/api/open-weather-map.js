@@ -58,6 +58,33 @@ export function getWeather(city, unit) {
     });
 }
 
+export function getLocalWeather(city, unit) {
+    var url = `${baseUrl}&q=${encodeURIComponent(city)}&units=${unit}`;
+
+    console.log(`Making request to: ${url}`);
+
+    return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
+        if (res.data.cod && res.data.message) {
+            throw new Error(res.data.message);
+        } else {
+            return {
+                city: capitalize(city),
+                code: res.data.weather[0].id,
+                group: getWeatherGroup(res.data.weather[0].id),
+                description: res.data.weather[0].description,
+                temp: res.data.main.temp,
+                unit: unit // or 'imperial'
+            };
+        }
+    }).catch(function(err) {
+        if (axios.isCancel(err)) {
+            console.error(err.message, err);
+        } else {
+            throw err;
+        }
+    });
+}
+
 export function cancelWeather() {
     weatherSource.cancel('Request canceled');
 }
@@ -76,9 +103,6 @@ export function getForecast(city, unit) {
             
             for (var i = 0 ; i < 5 ; i++) {
                 let dayIndex = i * 8 + 1;
-                // if(dayIndex < 0){
-                //     dayIndex = 0;
-                // }
                 let day = new Date(rawList[dayIndex].dt *1000)
                 let dayOfWeek;
 
@@ -131,6 +155,75 @@ export function getForecast(city, unit) {
         }
     });
 }
+
+export function getLocalForecast(lat, lon, unit) {
+    var url = `${forecastUrl}&lat=${lat}&lon=${lon}&units=${unit}`;
+
+    console.log(`Making local forecast request to: ${forecastUrl}`);
+
+    return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
+        if (res.data.list === undefined) {
+            throw new Error(res.data.message);
+        } else {
+            let rawData = res.data;
+            let rawList = rawData.list;
+            let forecastList = new Array(5);
+            
+            for (var i = 0 ; i < 5 ; i++) {
+                let dayIndex = i * 8 + 1;
+                let day = new Date(rawList[dayIndex].dt *1000)
+                let dayOfWeek;
+
+                switch (day.getDay()) {
+                    case 0:
+                        dayOfWeek = 'SUN';
+                        break;
+                    case 1:
+                        dayOfWeek = 'MON';
+                        break;
+                    case 2:
+                        dayOfWeek = 'TUE';
+                        break;
+                    case 3:
+                        dayOfWeek = 'WED';
+                        break;
+                    case 4:
+                        dayOfWeek = 'THU';
+                        break;
+                    case 5:
+                        dayOfWeek = 'FRI';
+                        break;
+                    case 6:
+                        dayOfWeek = 'SAT';
+                        break;
+                }
+
+                forecastList[i]={
+                    city: capitalize(rawData.city.name),
+                    dayOfWeek: dayOfWeek,
+                    code: rawList[dayIndex].weather[0].id,
+                    group: getWeatherGroup(rawList[dayIndex].weather[0].id),
+                    description: rawList[dayIndex].weather[0].description,
+                    temp: rawList[dayIndex].main.temp,
+                    date: new Date(rawList[dayIndex].dt * 1000).toLocaleDateString(),
+                    unit: unit
+                }
+            }
+
+            return {
+                forecastList
+            };
+
+        }
+    }).catch(function(err) {
+        if (axios.isCancel(err)) {
+            console.error(err.message, err);
+        } else {
+            throw err;
+        }
+    });
+}
+
 
 export function cancelForecast() {
     weatherSource.cancel('Request canceled');

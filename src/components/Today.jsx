@@ -17,6 +17,7 @@ import {
 import WeatherDisplay from 'components/WeatherDisplay.jsx';
 import WeatherForm from 'components/WeatherForm.jsx';
 import {getWeather} from 'api/open-weather-map.js';
+import {getLocalWeather} from 'api/open-weather-map.js';
 
 import './weather.css';
 
@@ -55,6 +56,7 @@ export default class Today extends React.Component {
 
     componentDidMount() {
         this.getWeather('Hsinchu', 'metric');
+        //getLocalWeather('Hsinchu', 'metric');
     }
 
     componentWillUnmount() {
