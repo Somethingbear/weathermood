@@ -156,8 +156,8 @@ export function getForecast(city, unit) {
     });
 }
 
-export function getLocalForecast(lat, lon, unit) {
-    var url = `${forecastUrl}&lat=${lat}&lon=${lon}&units=${unit}`;
+export function getLocalForecast(lat, lng, unit) {
+    var url = `${forecastUrl}&lat=${lat}&lon=${lng}&units=${unit}`;
 
     console.log(`Making local forecast request to: ${forecastUrl}`);
 
